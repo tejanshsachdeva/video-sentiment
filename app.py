@@ -34,9 +34,10 @@ def analyze_video(video_path):
                 
                 # Extract the emotion with the highest score
                 dominant_emotion = max(emotion_scores, key=emotion_scores.get)
-                
-                # Append the dominant emotion to the frame_emotions list
                 frame_emotions.append(dominant_emotion)
+
+                # Print the detected emotions for debugging
+                print(f"Detected emotions for the frame: {emotion_scores}, Dominant emotion: {dominant_emotion}")
         else:
             print("No emotions detected in this frame.")
 
@@ -51,8 +52,9 @@ def analyze_video(video_path):
     return frame_emotions, overall_emotion
 
 
+
 # Main execution
-video_path = 'test2.mp4'  # Ensure this matches your video file name
+video_path = 'test1.mp4'  # Ensure this matches your video file name
 frame_emotions, overall_emotion = analyze_video(video_path)
 
 print(f"Frame-by-frame emotions: {frame_emotions}")
