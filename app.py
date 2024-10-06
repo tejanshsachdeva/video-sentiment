@@ -1,3 +1,5 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  
 import cv2
 from fer import FER
 from collections import Counter
@@ -14,8 +16,11 @@ def detect_emotion(face):
 def analyze_video(video_path):
     cap = cv2.VideoCapture(video_path)
     frame_emotions = []
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    while cap.isOpened():
+    print("Processing video...")
+    
+    for frame_number in range(total_frames):
         ret, frame = cap.read()
         if not ret:
             break
@@ -26,24 +31,17 @@ def analyze_video(video_path):
         # Detect emotions from the frame
         emotions = detector.detect_emotions(rgb_frame)
 
-        # Check if any emotions were detected
         if emotions:
             for emotion in emotions:
-                # Get the emotion scores
                 emotion_scores = emotion['emotions']
-                
-                # Extract the emotion with the highest score
                 dominant_emotion = max(emotion_scores, key=emotion_scores.get)
                 frame_emotions.append(dominant_emotion)
 
-                # Print the detected emotions for debugging
-                print(f"Detected emotions for the frame: {emotion_scores}, Dominant emotion: {dominant_emotion}")
-        else:
-            print("No emotions detected in this frame.")
+        if frame_number % 20 == 0:
+            print(f"Processed {frame_number}/{total_frames} frames...")
 
     cap.release()
 
-    # Analyze overall video emotion
     if frame_emotions:
         overall_emotion = Counter(frame_emotions).most_common(1)[0][0]
     else:
@@ -51,20 +49,15 @@ def analyze_video(video_path):
 
     return frame_emotions, overall_emotion
 
-
-
 # Main execution
-video_path = 'test1.mp4'  # Ensure this matches your video file name
+video_path = 'test2.mp4'  # Ensure this matches your video file name
 frame_emotions, overall_emotion = analyze_video(video_path)
 
-print(f"Frame-by-frame emotions: {frame_emotions}")
 print(f"Overall video emotion: {overall_emotion}")
 
-# Visualize emotions over time
 plt.figure(figsize=(12, 6))
 emotion_counts = Counter(frame_emotions)
 
-# Creating a bar chart for the emotions detected
 plt.bar(emotion_counts.keys(), emotion_counts.values())
 plt.title('Emotion Distribution Over Video Frames')
 plt.xlabel('Emotions')
